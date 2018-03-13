@@ -1,11 +1,8 @@
 # coding: utf-8
 require "gviz"
 require "ScenarioGraph"
-include ScenarioGraph
 
-$ShowId = true
-
-Graph do
+ScenarioGraph('fatesnseq2', true) do
   scenes :s0000, <<OPTIONS, <<END, nil, :s0001
 1・十年前の回想〜朝
 Rebirth
@@ -26,28 +23,21 @@ OPTIONS
 アルバイトに行こう。
 END
 
-  scenes :s0002, <<END
+  scenes :s0002, <<OPTIONS, <<END, nil, nil, :s0003
 一日目・放課後
 高値の花 (誤字にあらず)
 ・夜の帰宅
 白い少女
 ・夕食後
 おつかれさまでした
-END
-  
-  route :s0002 => :c0003
-  
-  options :c0003, <<END
+OPTIONS
 桜を送っていく
 藤ねえと遊ぶ。
 大人しく休む。
 END
 
-  
-  edge :c0003_s0003, label:3
-
   ## 3
-  scenes :s0003, <<END
+  scenes :s0003, <<OPTIONS, <<END, :Rin
 ・夜
 更におつかれさまでした。
 ・就寝
@@ -74,21 +64,16 @@ END
 もういちど
 セイバー召喚。VSランサー
 プロミスト・サイン
-END
-
-  route :s0003 => :c0004
-
-  options :c0004, <<END
+OPTIONS
 止める
 止めない
 END
 
-  edge :c0004_Rin, label: 1
   node :Rin, label:"凛ルート", shape:"oval"
   route :Rin => :s1004
 
   ## 1
-  scenes :s1004, <<OPTIONS, <<END
+  scenes :s1004, <<OPTIONS, <<END, :s1005, :s1054, :s1006
 三日目・夜
 令呪、一回目
 ・夜〜凛〜協会
@@ -103,9 +88,7 @@ OPTIONS
 遠坂の言葉に従う
 END
 
-  edge :s1004opt_s1005, label: 1
-
-  scenes :s1005, <<OPTIONS, <<END
+  scenes :s1005, <<OPTIONS, <<END, :s1006, :s1007
 VSバーサーカー
 何処に向う
 OPTIONS
@@ -113,34 +96,72 @@ OPTIONS
 墓地に向かう
 END
 
-  edge :s1005opt_s1006, label: 1
-  edge :s1005opt_s1007, label: 2
   scenes :s1006, <<END
 VSバーサーカー
 三度目の死
 END
-  
+
   route :s1006 => :tiger15
   tiger 15
-  
-  edge :s1004opt_s1006, label: 2
-  
-  scenes :s1007, <<END
+
+  scenes :s1054, <<OPTIONS, <<END, :s1055, :s1056
 VSバーサーカー
 互角の戦い〜アーチャーの狙撃
+OPTIONS
+セイバーを呼び戻す
+セイバーを連れ戻す
+END
+
+  scenes :s1055, <<END
 VSバーサーカー
 呼び戻す声
 END
 
-  node :Movie, label:"Movie"
-  route :s1007 => :Movie
-  route :Movie => :s1008
+  route :s1055 => :flag1
 
-  scenes :s1008, <<OPTIONS, <<END
+  scenes :s1056, <<END
+VSバーサーカー
+ディストレーション (II)
+END
+  route :s1056 => :flag2
+
+  scenes :s1007, <<END
+VSバーサーカー
+互角の戦い〜アーチャーの狙撃
+END
+  route :s1007 => :s1055
+
+  flag 1
+  flag 2
+
+  route :flag1 => :movie1
+  route :flag2 => :movie2
+
+  node :movie1, label:"Movie"
+  node :movie2, label:"Movie"
+
+  route :movie1 => :s1008
+  route :movie2 => :s1058
+
+  scenes :s1008, <<END
 4・目覚め〜自室
 凛との決別〜セイバーと会話
 会話中
 昨夜、傷を負っていない
+END
+
+  route :s1008 => :s1057
+
+  scenes :s1058, <<END
+4・目覚め〜自室
+凛との決別〜セイバーと会話
+会話中
+昨夜、傷を負っている
+END
+
+  route :s1058 => :s1057
+
+  scenes :s1057, <<OPTIONS, <<END, :s1009
 ・道場〜電話
 セイバーの和解〜まだ見ぬ過ち
 ・午後・学校
@@ -151,14 +172,13 @@ OPTIONS
 セイバーに学校案内をする。
 END
 
-  edge :s1008opt_s1009, label:1
   scenes :s1009, <<END
 4・弓道場
 立射
 END
 
   route :s1009 => :s1010
-  scenes :s1010, <<OPTIONS, <<END
+  scenes :s1010, <<OPTIONS, <<END, :s1011
 4・帰宅～夕食
 藤ねえたちにセイバーを紹介～女の子同盟?
 ・夜〜就寝
@@ -173,7 +193,6 @@ OPTIONS
 藤ねえを起こしに行こう
 END
 
-  edge :s1010opt_s1011, label: 1
   scenes :s1011, <<END
 五日目・朝
 セイバーの様子を見る
@@ -181,7 +200,7 @@ END
 
   route :s1011 => :s1012
 
-  scenes :s1012, <<OPTIONS, <<END
+  scenes :s1012, <<OPTIONS, <<END, :s1013, :s1014
 5・朝食～登校
 日常 II
 ・朝、学校
@@ -193,18 +212,15 @@ OPTIONS
 廊下に飛び退く
 END
 
-  edge :s1012opt_s1013, label: 1
-  edge :s1012opt_s1014, label: 2
-
   scenes :s1013, <<END
 5・放課後
 テクスチャー
 END
-  
+
   route :s1013 => :tiger16
   tiger 16
-  
-  scenes :s1014, <<OPTIONS, <<END, :s1015A, :s1015B
+
+  scenes :s1014, <<OPTIONS, <<END, :flag3, :flag4
 VS遠坂凛
 パニックソニックコースター
 OPTIONS
@@ -212,7 +228,14 @@ OPTIONS
 遠坂に負けを認めていいのか？
 END
 
-  scenes :s1015A, <<OPTIONS, <<END, :s1016, :s1017A, :s1023A
+  flag 3
+  flag 4
+
+  route :flag3 => :s1015
+  route :flag4 => :s1015
+
+
+  scenes :s1015, <<OPTIONS, <<END, :s1016, :s1017, :s1023A
 5・睨み合い〜雑木林へ
 絞首刑〜VSライダー
 OPTIONS
@@ -221,14 +244,6 @@ OPTIONS
 右手に刺さった”釘”を抜けば
 END
 
-  scenes :s1015B, <<OPTIONS, <<END, :s1016, :s1017B, :s1023B
-5・睨み合い〜雑木林へ
-絞首刑〜VSライダー
-OPTIONS
-令呪を使う
-残った左手で応戦する
-右手に刺さった”釘”を抜けば
-END
 
   scenes :s1016, <<END
 VSライダー
@@ -238,7 +253,7 @@ END
   route :s1016 => :tiger17
   tiger 17
 
-  scenes :s1017A, <<OPTIONS, <<END, :s1018A
+  scenes :s1017, <<OPTIONS, <<END, :s1018
 5・VSライダー
 応戦
 5・雑木林〜遠坂邸
@@ -258,28 +273,7 @@ OPTIONS
 そういう事になるな
 END
 
-  scenes :s1017B, <<OPTIONS, <<END, :s1018B
-5・VSライダー
-応戦
-5・雑木林〜遠坂邸
-凛の治療
-・凛の部屋
-自然治癒の体
-・凛の部屋
-協力関係、成立
-・帰宅
-アーチャーの見送り。英雄の定義
-・夕食
-本日の夕食
-・夜
-セイバーに、凛と協力関係になったと報告
-OPTIONS
-断言はできない
-そういう事になるな
-END
-
-
-  scenes :s1018A, <<OPTIONS, <<END, :s1019A
+  scenes :s1018, <<OPTIONS, <<END, :s1019
 5・就寝
 セイバー忠告
 幕間
@@ -298,49 +292,8 @@ OPTIONS
 日が沈んで夕飯になる前に、セイバーに帰宅を報告しに行こう
 END
 
-  scenes :s1018B, <<OPTIONS, <<END, :s1019B, nil
-5・就寝
-セイバー忠告
-幕間
-ある話
-6・朝〜学校
-慎二と美綴
-6・放課後
-結界探し〜凛による精神的いじめ
-・放課後
-マスター判明
-・帰宅、夕食前
-藤ねえの三分間ダッキング
-OPTIONS
-日が沈んで夕飯になる前に、藤ねえの悪行を止めておこう
-日が沈んで夕飯になる前に、桜の様子を見てこよう
-日が沈んで夕飯になる前に、セイバーに帰宅を報告しに行こう
-END
 
-  scenes :s1019A, <<OPTIONS, <<END, :s1020A
-6・夕食前
-強襲、お好み焼き丼阻止
-6・夕食後、剣の稽古
-平和な一時
-・深夜
-コーリング
-幕間
-セイバーVSアサシン
-・柳洞寺境内
-アーチャーVSキャスター
-・柳洞寺境内
-フォールダウン、ユアマインド
-7・朝〜剣の稽古
-セイバー〜不機嫌
-・学校・昼休み
-忍び寄るアクマの影
-OPTIONS
-あいつの狙いは俺だ。大人しく出て行こう
-あいつの狙いは俺だ。死にたくないから黙っていよう
-あいつの狙いは俺だ。分からないからとぼけよう
-END
- 
-  scenes :s1019B, <<OPTIONS, <<END, :s1020B
+  scenes :s1019, <<OPTIONS, <<END, :s1020
 6・夕食前
 強襲、お好み焼き丼阻止
 6・夕食後、剣の稽古
@@ -363,7 +316,8 @@ OPTIONS
 あいつの狙いは俺だ。分からないからとぼけよう
 END
 
-  scenes [:s1020A, :s1020B], <<OPTIONS, <<END, [:s1021A, :s1021B]
+
+  scenes :s1020, <<OPTIONS, <<END, :s1021
 7・昼休み
 懸命な判断
 ・屋上
@@ -375,7 +329,7 @@ OPTIONS
 令呪を使用してセイバーを呼ぶ
 END
 
-  scenes [:s1021A, :s1021B], <<OPTIONS, <<END, :s1022, [:s1024A, :s1024B]
+  scenes :s1021, <<OPTIONS, <<END, :s1022, :s1024
 7・鮮血神殿
 凛の忠告
 7・鮮血神殿
@@ -394,7 +348,7 @@ OPTIONS
 一応、話を聞いてみる
 無駄だろうし、止めておこう
 END
-  
+
   scenes :s1022, <<END
 8・生徒会室
 ヒュプノス
@@ -403,7 +357,7 @@ END
   route :s1022 => :tiger18
   tiger 18
 
-  scenes [:s1023A, :s1023B], <<OPTIONS, <<END
+  scenes :s1023A, <<OPTIONS, <<END
 VSライダー
 奮戦
 5・雑木林〜遠坂邸
@@ -423,7 +377,7 @@ OPTIONS
 そういう事になるな
 END
 
-  scenes [:s1024A, :s1024B], <<OPTIONS, <<END, nil, [:s1025A, :s1025B], [nil, :s1051B]
+  scenes :s1024, <<OPTIONS, <<END, :flag11, :flag12, :flag13
 8・生徒会室
 深追い厳禁
 幕間
@@ -436,9 +390,33 @@ OPTIONS
 今日は肉の特売日。ご馳走にしてセイバーを喜ばせよう
 END
 
-  scenes [:s1025A, :s1025B], <<OPTIONS, <<END, [:s1026A, :s1026B]
+  flag 11
+  flag 12
+  flag 13
+
+  route :flag11 => :s1067
+  route :flag12 => :s1025
+  route :flag13 => :s1065
+
+  scenes :s1067, <<END
+8・放課後〜間桐邸
+あやしい二人
+END
+  route :s1067 => :s1066
+
+  scenes :s1025, <<END
 8・放課後〜帰宅
 電話で連絡
+END
+  route :s1025 => :s1066
+
+  scenes :s1065, <<END
+8・放課後〜商店街
+おかしなメイド
+END
+  route :s1065 => :s1066
+
+  scenes :s1066, <<OPTIONS, <<END, :s1026A
 ・夕食〜就寝
 その理由
 幕間
@@ -452,7 +430,7 @@ OPTIONS
 今はそれしかない
 END
 
-  scenes [:s1026A, :s1026B, :s1026C], <<OPTIONS, <<END, :s1027, [:s1028A, :s1028B, :s1028C]
+  scenes :s1026A, <<OPTIONS, <<END, :s1027, :s1028A
 9・夜・奇襲
 止める
 ・奇襲
@@ -465,16 +443,16 @@ OPTIONS
 セイバーの助けに入る
 遠坂を守りきる
 END
-  
+
   scenes :s1027, <<END
 9・奇襲
 殺人鬼
 END
-  
+
   route :s1027 => :tiger19
   tiger 19
 
-  scenes [:s1028A, :s1028B, :s1028C], <<OPTIONS, <<END, [:s1029A, :s1029B, :s1029C], [:s1037A, :s1037B, :s1037C]
+  scenes :s1028A, <<OPTIONS, <<END, :s1029, :s1037, :s1061
 9・奇襲
 応戦、投影魔術
 9・夜・交差点
@@ -495,15 +473,34 @@ OPTIONS
 寒いのでパス。ミカンミカンミカン
 END
 
-  scenes [:s1029A, :s1029B], <<END
+  scenes :s1029, <<END
 10・夜
 凛と投影魔術の話
 END
 
-  route :s1029A => :s1052A
-  route :s1029B => :s1052B
-  
-  scenes [:s1052A, :s1052B, :s1052C], <<OPTIONS, <<END, [:s1030A, :s1030B, :s1030C], [:s1036A, :s1036B, :s1036C]
+  flag 5
+  flag 6
+  flag 7
+
+  route :s1029 => :flag5
+  route :flag5 => :s1052
+
+  scenes :s1037, <<END
+10・夜・道場
+セイバーの好き嫌い。ワイルドワイルドイングランド
+END
+
+  route :s1037 => :flag6
+  route :flag6 => :s1052
+
+  scenes :s1061, <<END
+10・夜・今
+どっちが好きなの？
+END
+  route :s1061 => :flag7
+  route :flag7 => :s1052
+
+  scenes :s1052, <<OPTIONS, <<END, :s1030, :s1036
 ・夜・縁側
 遠坂凛 (V) 〜士郎の瑕
 ・就寝〜土蔵
@@ -514,8 +511,8 @@ OPTIONS
 パンがないのは今朝は和風で。というか犯人をとっちめに行く
 パンの使い道はあえて不問。ジョギングがてらに商店街へ
 END
-  
-  scenes :s1030A, <<OPTIONS, <<END, :s1035, :s1031A
+
+  scenes :s1030, <<OPTIONS, <<END, :s1035, :s1031
 11・早朝・離れ
 犯人はオマエ
 OPTIONS
@@ -523,7 +520,7 @@ OPTIONS
 ま、遠坂なら大丈夫だろう
 END
 
-  scenes [:s1031A, :s1031B, :s1031C], <<OPTIONS, <<END, [:s1032A, :s1032B, :s1032A], :s1034
+  scenes :s1031, <<END
 11・〜商店街へ
 ライフシグナル大回灯
 ・朝食
@@ -534,12 +531,9 @@ END
 スペシャル？
 ・午後・帰宅
 キャスター襲来
-OPTIONS
-断る
-従う
 END
-  
-  scenes :s1032A, <<END
+
+  scenes :s1032, <<END
 拒否
 ディストレーション (III)〜ルールブレーカー
 11・逃走〜遠坂邸へ
@@ -554,13 +548,25 @@ END
 戦う理由
 幕間
 聖女陵辱
+END
+
+  edge :s1032, :s1059, '※3'
+
+  node :n1, label:''
+
+  edge :s1032, :n1, '※4'
+  route :n1 => :s1060
+  edge :n1, :s1059, '※13&※6'
+
+
+  scenes :s1059, <<END
 12・戦いへ
 情報源
 END
 
-  route :s1032A => :s1038
+  route :s1059 => :s1038
 
-  scenes :s1038, <<OPTIONS, <<END
+  scenes :s1038, <<OPTIONS, <<END, :s1033, :s1033, :s1033
 12・教会
 バッドラック
 OPTIONS
@@ -569,7 +575,7 @@ OPTIONS
 隙を見つける
 END
 
-  edge :s1038opt_s1033, label:'1,2,3'
+#  edge :s1038opt_s1033, label:'1,2,3'
 
   scenes :s1033, <<END
 12・教会〜掌
@@ -587,22 +593,8 @@ END
 
   tiger 20
   route :s1034 => :tiger20
-  
-  scenes :s1032B, <<OPTIONS, <<END, :s1039, :s1038
-拒否
-ディストレーション (III)〜ルールブレーカー
-11・逃走〜遠坂邸へ
-戦線離脱
-幕間
-遠坂凛 (VI)
-・夜・ビル屋上
-ディスタンス
-幕間
-魔女の思惑
-・帰宅〜自室
-戦う理由
-幕間
-聖女陵辱
+
+  scenes :s1060, <<OPTIONS, <<END, :s1039, :s1038
 12・戦いへ
 選択肢
 OPTIONS
@@ -622,9 +614,7 @@ END
 キャスター襲来
 END
 
-  route :s1035 => :s1031Aopt
-
-  scenes [:s1036A, :s1036B, :s1036C], <<END
+  scenes :s1036, <<OPTIONS, <<END, :s1032, :s1034
 11・早朝〜
 深山町最速伝説
 ・朝食
@@ -635,19 +625,11 @@ END
 スペシャル？
 ・午後・帰宅
 キャスター襲来
+OPTIONS
+断る
+従う
 END
 
-  route :s1036A => :s1031Aopt
-  route :s1036B => :s1031Bopt
-  route :s1036C => :s1031Copt
-  
-  scenes [:s1037A, :s1037C], <<END
-10・夜・道場
-セイバーの好き嫌い。ワイルドワイルドイングランド
-END
-  route :s1037A => :s1052A
-  route :s1037C => :s1052C
-  
   scenes :s1039, <<OPTIONS, <<END, :s1040, :s1041
 12・新都へ
 囮探索
@@ -667,7 +649,7 @@ END
 
   tiger 22
   route :s1040 => :tiger22
-  
+
   scenes :s1041, <<OPTIONS, <<END, :s1042
 12・対峙
 アーチャーの裏切り
@@ -692,7 +674,7 @@ OPTIONS
 正面突破は却下だ。教会に抜け道とかある？
 俺たちだけでは無理だ。他のマスターと協力する。
 END
-  
+
 
   scenes :s1043, <<OPTIONS, <<END, :s1044, :s1045
 凛の笑顔
@@ -711,7 +693,7 @@ OPTIONS
 自分を押し留める
 男を止める
 END
-  
+
   scenes :s1044, <<END
 決断
 イリヤの死
@@ -766,7 +748,7 @@ OPTIONS
 止めて、どうする
 END
 
-  scenes :s1047, <<OPTIONS, <<END, nil, :s1048
+  scenes :s1047, <<OPTIONS, <<END, :flag8, :flag9, :flag10
 選択
 理想
 14・教会地下聖堂
@@ -797,9 +779,34 @@ OPTIONS
 もう一度、よく考えてみる
 END
 
-  scenes :s1048, <<OPTIONS, <<END, :s1049, :s1050
+  flag 8
+  flag 9
+  flag 10
+
+  route :flag9 => :s1048
+
+  scenes :s1048, <<END
 最後の行動
 セイバーとお茶を
+END
+
+  route :s1048 => :s1062
+
+  scenes :s1063, <<END
+最後の行動
+凛に相談
+END
+  route :flag8 => :s1063
+  route :s1063 => :s1062
+
+  scenes :s1064, <<END
+最後の行動
+もう一度考える
+END
+  route :flag10 => :s1064
+  route :s1064 => :s1062
+
+  scenes :s1062, <<OPTIONS, <<END, :s1049, :s1050
 15・夜
 凛の提案 (致死量)
 二人の選択
@@ -841,25 +848,11 @@ END
 END
 
   node :RinTrue, label: "凛ルート True End"
-  route :s1050 => :RinTrue
-  
-  scenes :s1051B, <<OPTIONS, <<END, :s1026C
-8・放課後〜商店街
-おかしなメイド
-・夕食〜就寝
-その理由
-幕間
-ある騎士の物語
-9・朝〜放課後
-柳洞寺に済む、もう一人の人物
-・夜、集合〜決行
-葛木先生にガンドを撃つ凛
-OPTIONS
-やっぱり危険だ。遠坂を止める
-今はそれしかない
-END
-
-  save(:fatesnseq2, :png)
-
+  node :RinGood, label: "凛ルート Good End"
+  edge :s1050, :RinTrue, '※1'
+  node :n0, label: ''
+  edge :s1050, :n0, '※2'
+  route :n0 => :RinTrue
+  edge :n0, :RinGood, '※6&※9'
 
 end
